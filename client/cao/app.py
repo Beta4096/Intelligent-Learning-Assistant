@@ -1,0 +1,48 @@
+# backend/app.py
+from flask import Flask, request, jsonify
+from flask_cors import CORS   # 允许前端 JS 调用
+from regi_login import submit_auth
+from upload import upload_file, delete as delete_textbook
+from question import upload_question
+
+app = Flask(__name__)
+CORS(app)
+
+@app.post("/api/auth")
+def auth():
+    data = request.get_json()
+    res = submit_auth(
+        data.get("username",""),
+        data.get("password",""),
+        data.get("confirm_password",""),
+        data.get("type","")
+    )
+    return jsonify(res)
+
+@app.post("/api/upload-textbook")
+def upload_textbook():
+    data = request.get_json()
+    token = data.get("token")
+    file_path = data.get("file_path")
+    res = upload_file(token, file_path)
+    return jsonify(res)
+
+@app.post("/api/delete-textbook")
+def delete_textbook_api():
+    data = request.get_json()
+    token = data.get("token")
+    path = data.get("path")
+    res = delete_textbook(token, path)
+    return jsonify(res)
+
+@app.post("/api/question")
+def question_api():
+    data = request.get_json()
+    token = data.get("token")
+    text = data.get("text")
+    images = data.get("images", [])
+    res = upload_question(token, text, images)
+    return jsonify(res)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080, debug=True)
