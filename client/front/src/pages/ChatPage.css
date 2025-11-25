@@ -1,0 +1,35 @@
+/* 移除列表项默认的边框和内边距 */
+.ant-list-item {
+  border: none !important;
+  padding: 8px 0 !important;
+}
+
+/* 消息气泡的基础样式 */
+.message-bubble {
+  padding: 10px 15px;
+  border-radius: 18px;
+  max-width: 70%;
+  word-wrap: break-word; 
+}
+
+/* AI 消息 */
+.ai-message {
+  display: flex;
+  justify-content: flex-start; 
+}
+
+.ai-message .message-bubble {
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+}
+
+/* 用户消息 */
+.user-message {
+  display: flex;
+  justify-content: flex-end; 
+}
+
+.user-message .message-bubble {
+  background-color: #1890ff;
+  color: white;
+}
