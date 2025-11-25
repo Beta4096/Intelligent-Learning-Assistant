@@ -2,6 +2,9 @@ import base64
 import os
 import time
 import requests
+from dotenv import load_dotenv
+load_dotenv()
+
 SERVER_BASE_URL = os.getenv("SERVER_BASE_URL", "https://your-server.example.com")
 TIMEOUT = float(os.getenv("HTTP_TIMEOUT", "10.0"))
 
@@ -50,3 +53,7 @@ def upload_question(token: str, text: str = "", images=None):
             return {"success": False, "msg": "出错了！"}
     except requests.RequestException as e:
         return {"success": False, "msg": "发生错误，错误类型："+str(e)}
+
+if __name__ == "__main__":
+    result1 = upload_question("test_token_123", "这是一个测试问题")
+    print(f"结果: {result1}\n")

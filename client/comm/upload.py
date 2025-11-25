@@ -6,7 +6,8 @@ import time
 from tkinter import filedialog
 
 import requests
-
+from dotenv import load_dotenv
+load_dotenv()
 SERVER_BASE_URL = os.getenv("SERVER_BASE_URL", "https://your-server.example.com")
 TIMEOUT = float(os.getenv("HTTP_TIMEOUT", "10.0"))
 

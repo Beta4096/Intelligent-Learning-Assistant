@@ -22,7 +22,10 @@ rad.json
 TestResults.xml
 
 #.envs
-client/cao/.env
+*.env
+
+
+.venv/
 
 .idea/
 *.iml
