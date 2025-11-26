@@ -10,7 +10,10 @@ NOTION_VERSION = "2022-06-28"
 
 app = Flask(__name__)
 OAUTH_RESULT = {"access_token": None, "error": None}
-
+from dotenv import load_dotenv
+load_dotenv()
+SERVER_BASE_URL = os.getenv("SERVER_BASE_URL", "https://your-server.example.com")
+TIMEOUT = float(os.getenv("HTTP_TIMEOUT", "10.0"))
 
 def build_auth_url(client_id: str, redirect_uri: str) -> str:
     """
@@ -68,6 +71,22 @@ def create_container_page_in_private(token: str, title="Learning Assistant") -> 
     r.raise_for_status()
     return r.json()["id"]
 
+def find_existing_learning_assistant(token: str):
+    url = "https://api.notion.com/v1/search"
+    payload = {
+        "query": "Learning Assistant",
+        "sort": {"timestamp": "last_edited_time", "direction": "descending"}
+    }
+    r = requests.post(url, json=payload, headers=notion_headers(token))
+    r.raise_for_status()
+    results = r.json().get("results", [])
+    for item in results:
+        if item["object"] == "page":
+            # 如果标题匹配，则返回
+            title = item["properties"]["title"][0]["text"]["content"]
+            if title == "Learning Assistant":
+                return item["id"]
+    return None
 
 def create_child_page_and_write(token: str, parent_page_id: str, child_title="New Export") -> str:
     """
@@ -182,7 +201,9 @@ def add_learning_assistant_entry(token: str, entry_title="New Entry", entry_text
     然后在其下创建一个子页面写入一条信息
     """
     print("[LA] Creating 'Learning Assistant' container page in Private workspace...")
-    container_id = create_container_page_in_private(token, title="Learning Assistant")
+    container_id = find_existing_learning_assistant(token)
+    if not container_id:
+        container_id = create_container_page_in_private(token, title="Learning Assistant")
 
     print("[LA] Creating a child entry page...")
     child_id = create_child_page_and_write(
@@ -197,12 +218,23 @@ def add_learning_assistant_entry(token: str, entry_title="New Entry", entry_text
     print("Entry Page ID:", child_id)
     return container_id, child_id
 
+def notif_server(token,code):
+    url = f"{SERVER_BASE_URL}"
+    payload = {
+        "type": "export",
+        "token": token,
+        "code": code,
+    }
+    try:
+        resp = requests.post(url, json=payload, timeout=TIMEOUT)
+    except requests.RequestException as e:
+        return {"success": False,"msg": "发生错误，错误类型："+str(e)}
+    return {"success": True, "msg": "导出成功"}
 
 def main():
     client_id = os.getenv("NOTION_CLIENT_ID")
     client_secret = os.getenv("NOTION_CLIENT_SECRET")
     redirect_uri = "http://localhost:8765/callback"
-
     if "YOUR_" in client_id or "YOUR_" in client_secret:
         raise RuntimeError("Please fill client_id / client_secret / redirect_uri in main().")
 

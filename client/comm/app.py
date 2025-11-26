@@ -1,10 +1,12 @@
 # backend/app.py
+import threading
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS   # 允许前端 JS 调用
 from regi_login import submit_auth
 from upload import upload_file, delete as delete_textbook
 from question import upload_question
-
+from export import export_cli
 app = Flask(__name__)
 CORS(app)
 
@@ -43,6 +45,13 @@ def question_api():
     images = data.get("images", [])
     res = upload_question(token, text, images)
     return jsonify(res)
+
+@app.post("/api/export")
+def export_api():
+    data = request.get_json()
+    token = data.get("token")
+    threading.Thread(target=export_cli, args=(token,), daemon=True).start()
+    return jsonify({"status": "started"})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)

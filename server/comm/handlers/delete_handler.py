@@ -1,9 +1,8 @@
-import time
-
 from flask import jsonify
 
 from .tools import verify_token
-from ..db import db_select,db_delete
+from server.comm.db import db_delete
+
 
 def handle_delete(data):
 

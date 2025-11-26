@@ -42,3 +42,7 @@ const qa = await postJSON("/question", {//问问题
     "E:/docs/math/step2.jpg"
   ]
 });
+
+const ex = await postJSON("/export",{
+  token: "<user_token>",
+});

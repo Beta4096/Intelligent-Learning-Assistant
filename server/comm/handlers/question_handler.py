@@ -1,8 +1,9 @@
 from flask import jsonify
 
 from server.comm.db import db_insert, db_select
-from tools import verify_token
+from server.comm.handlers.tools import verify_token
 def handle_question(data):
+    #return jsonify({"answer":"blue!"}),200
 
     token = data["token"]
     check,username = verify_token(token)
