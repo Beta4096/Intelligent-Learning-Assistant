@@ -13,6 +13,6 @@ def handle_delete(data):
         return check
 
     file_id = data["file_id"]
-    db_delete("history","file_id",file_id)
+    db_delete("textbook","file_id",file_id)
     return jsonify({"type": "done"}),200
 

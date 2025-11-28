@@ -1,6 +1,6 @@
 import time
 from flask import jsonify
-from server.comm.db import db_select
+from server.comm.db import db_select, db_insert
 
 
 def verify_token(token):
@@ -10,4 +10,5 @@ def verify_token(token):
     row = rows[0]
     if row["TTL"] < time.time():
         return False,jsonify({"type": "error","msg":"会话已过期"})
+    db_insert("token",{"token":token,"TTL":time.time()+900})
     return True, row["username"]
