@@ -1,3 +1,5 @@
+import traceback
+
 from flask import Flask, request, jsonify
 
 from handlers.export_handler import get_auth_url
@@ -37,6 +39,7 @@ def handle_packet():
     try:
         return handler(data)
     except Exception as e:
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 @app.get("/notion/auth_url")

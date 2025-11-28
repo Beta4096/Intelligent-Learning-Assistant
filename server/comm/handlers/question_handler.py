@@ -1,3 +1,5 @@
+import time
+from datetime import datetime, timezone
 from flask import jsonify
 
 from server.comm.db import db_insert, db_select
@@ -12,5 +14,7 @@ def handle_question(data):
         return check
 
     timestamp = data["timestamp"]
+    timestamp = datetime.fromtimestamp(timestamp, tz=timezone.utc)
     payload = data["payload"]
     db_insert("history",{"username":username,"timestamp":timestamp,"payload":payload,"role":"user"})
+    return jsonify({"type": "response","timestamp": time.time(),"answer": "示例回复"}),200

@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2._json import Json
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import os
@@ -77,19 +78,28 @@ def db_exists_multi(table, conditions: dict) -> bool:
 def db_insert(table, data: dict):
     columns = ", ".join(data.keys())
     placeholders = ", ".join(["%s"] * len(data))
-    values = tuple(data.values())
 
-    sql = f"INSERT INTO {table} ({columns}) VALUES ({placeholders}) RETURNING id"
+    # 对值做适配：如果是 dict/list，用 Json 包起来
+    adapted_values = []
+    for v in data.values():
+        if isinstance(v, (dict, list)):
+            adapted_values.append(Json(v))
+        else:
+            adapted_values.append(v)
+
+    values = tuple(adapted_values)
+
+    sql = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
 
     conn = _get_conn()
     try:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        with conn.cursor() as cur:
             cur.execute(sql, values)
-            inserted = cur.fetchone()
             conn.commit()
-            return inserted["id"] if inserted and "id" in inserted else None
+            return True
     finally:
         conn.close()
+
 
 def db_delete(table, column, value):
     """

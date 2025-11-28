@@ -37,6 +37,8 @@ def submit_auth(username: str, password: str, confirm_password: str, type: str):
 
     try:
         resp = requests.post(url, json=payload, timeout=TIMEOUT)
+        print("DEBUG status:", resp.status_code)
+        print("DEBUG body:", resp.text)
     except requests.RequestException as e:
         return {"success": False,"msg": "发生错误，错误类型："+str(e)}
 
@@ -57,3 +59,6 @@ def submit_auth(username: str, password: str, confirm_password: str, type: str):
             return {"success": False,"msg": "密码错误！"}
         else:
             return {"success": False,"msg": "其他错误"}
+if __name__ == "__main__":
+    result1 = submit_auth("134","124","124","register")
+    print(f"结果: {result1}\n")
