@@ -60,5 +60,5 @@ def submit_auth(username: str, password: str, confirm_password: str, type: str):
         else:
             return {"success": False,"msg": "其他错误"}
 if __name__ == "__main__":
-    result1 = submit_auth("134","124","124","register")
+    result1 = submit_auth("134","124","124","login")
     print(f"结果: {result1}\n")

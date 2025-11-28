@@ -3,6 +3,8 @@ import requests
 from flask import jsonify
 from dotenv import load_dotenv
 
+from server.comm.handlers.tools import verify_token
+
 load_dotenv()
 
 NOTION_VERSION = "2022-06-28"
@@ -107,13 +109,17 @@ def exchange_code_for_token(code):
 
 # ---------- 主导出逻辑（给 app.py 调用） ----------
 def handle_export(data):
-    app_user_token = data.get("token")
+    token = data.get("token")
     code = data.get("code")
 
-    if not app_user_token or not code:
+    if not token or not code:
         return jsonify({"success": False, "msg": "missing token or code"}), 400
 
     # 1. server 用 secret 换 token（客户端不能做）
+    check,info = verify_token(token)
+    # 2. 如果返回的不是 True，说明失败了，直接把错误 Response 返回给前端
+    if check is not True:
+        return info
     access_token = exchange_code_for_token(code)
 
     # 2. 找容器页，没有就创建

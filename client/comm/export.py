@@ -73,4 +73,4 @@ def export_cli(token):
 
 
 if __name__ == "__main__":
-    export_cli("TEST_TOKEN")
+    export_cli("dF2wnG75V0fBCu01O4JKl4xzOf0JkYIQXl1HUaJvbss")

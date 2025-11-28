@@ -70,10 +70,10 @@ def build_stopwords() -> set:
     print("[RAG] 已加载 NLTK 英文停用词。")
 
     # 加载 spaCy 英文停用词
-    import spacy  # type: ignore
-    nlp = spacy.load("en_core_web_sm")
-    base |= set(nlp.Defaults.stop_words)
-    print("[RAG] 已加载 spaCy 英文停用词。")
+    # import spacy  # type: ignore
+    # nlp = spacy.load("en_core_web_sm")
+    # base |= set(nlp.Defaults.stop_words)
+    # print("[RAG] 已加载 spaCy 英文停用词。")
 
     # 加载本地停用词文件
     possible_paths = [

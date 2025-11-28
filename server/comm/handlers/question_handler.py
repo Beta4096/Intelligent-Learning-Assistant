@@ -11,7 +11,8 @@ def handle_question(data):
     check,username = verify_token(token)
     # 2. 如果返回的不是 True，说明失败了，直接把错误 Response 返回给前端
     if check is not True:
-        return check
+        info = username
+        return info
 
     timestamp = data["timestamp"]
     timestamp = datetime.fromtimestamp(timestamp, tz=timezone.utc)
