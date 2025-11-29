@@ -11,7 +11,7 @@ import "./Sidebar.css";
 
 const { Text } = Typography;
 
-const Sidebar = ({ uploadedFiles = [], onFileUpload, onDeleteFile }) => {
+const Sidebar = ({ uploadedFiles = [], onFileUpload, onDeleteFile, t }) => {
   const uploadProps = {
     beforeUpload: (file) => {
       onFileUpload(file);
@@ -30,27 +30,30 @@ const Sidebar = ({ uploadedFiles = [], onFileUpload, onDeleteFile }) => {
 
   return (
     <div className="sidebar-container">
-      <h2 className="sidebar-title">📚 我的教材</h2>
+      {/* 标题 */}
+      <h2 className="sidebar-title">📚 {t.uploadTextbook}</h2>
 
+      {/* 上传按钮 */}
       <Upload {...uploadProps} showUploadList={false}>
         <Button className="upload-btn" icon={<UploadOutlined />}>
-          上传教材
+          {t.uploadTextbook}
         </Button>
       </Upload>
 
+      {/* 文件列表 */}
       <List
         className="file-list"
         dataSource={uploadedFiles}
-        locale={{ emptyText: "暂无上传文件" }}
+        locale={{ emptyText: t.noFiles || "No files" }}  // 国际化"暂无上传文件"
         renderItem={(item) => (
           <List.Item
             className="file-item"
             actions={[
               <Popconfirm
-                title="确认删除此文件吗？"
+                title={t.confirmDelete || "Confirm delete this file?"}
                 onConfirm={() => onDeleteFile && onDeleteFile(item)}
-                okText="删除"
-                cancelText="取消"
+                okText={t.delete || "Delete"}
+                cancelText={t.cancel || "Cancel"}
               >
                 <DeleteOutlined className="delete-btn" />
               </Popconfirm>,

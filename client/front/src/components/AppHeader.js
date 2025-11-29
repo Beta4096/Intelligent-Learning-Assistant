@@ -1,43 +1,41 @@
 // src/components/AppHeader.js
-
 import React from "react";
-import { Avatar, Switch } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { Layout, Button, Tooltip } from "antd";
+import { SunOutlined, MoonOutlined, SettingOutlined } from "@ant-design/icons";
 import "./AppHeader.css";
 
-const AppHeader = ({ onLogout, isDarkMode, onToggleTheme }) => {
+const { Header } = Layout;
+
+export default function AppHeader({ theme, toggleTheme, onOpenSettings, t }) {
   return (
-    <header className={`app-header ${isDarkMode ? "dark" : ""}`}>
-      <div className="left-section">
-        <img
-          src="/logo192.png"
-          alt="logo"
-          className="app-logo"
-        />
-        <h1 className="app-title">智能学习助手</h1>
+    <Header className="app-header">
+      {/* 标题国际化 */}
+      <div className="title">{t.appTitle}</div>
+
+      <div className="header-right">
+        {/* 主题切换 */}
+        <Tooltip title={t.switchTheme || "切换主题"}>
+          <Button
+            shape="circle"
+            icon={theme === "light" ? <MoonOutlined /> : <SunOutlined />}
+            onClick={toggleTheme}
+          />
+        </Tooltip>
+
+        {/* 设置按钮 */}
+        <Tooltip title={t.settings}>
+          <Button
+            shape="circle"
+            icon={<SettingOutlined />}
+            onClick={onOpenSettings}
+          />
+        </Tooltip>
+
+        {/* 登出 */}
+        <Button className="logout-btn" href="/login">
+          {t.logout}
+        </Button>
       </div>
-
-      <div className="right-section">
-        <Switch
-          checked={isDarkMode}
-          onChange={onToggleTheme}
-          checkedChildren="🌙"
-          unCheckedChildren="☀️"
-          className="theme-switch"
-        />
-
-        <Avatar
-          size={40}
-          icon={<UserOutlined />}
-          className="user-avatar"
-        />
-
-        <button className="logout-btn" onClick={onLogout}>
-          登出
-        </button>
-      </div>
-    </header>
+    </Header>
   );
-};
-
-export default AppHeader;
+}

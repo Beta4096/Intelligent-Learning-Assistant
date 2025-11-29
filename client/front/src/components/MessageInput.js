@@ -1,41 +1,67 @@
-// src/components/MessageInput.js
-
 import React, { useState } from "react";
 import { Input, Button } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 
-const MessageInput = ({ onSendMessage, disabled }) => {
-  const [inputValue, setInputValue] = useState("");
+export default function MessageInput({ onSendMessage, disabled, theme, t }) {
+  const [text, setText] = useState("");
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
-    onSendMessage(inputValue);
-    setInputValue("");
+  const send = () => {
+    if (!text.trim()) return;
+    onSendMessage(text);
+    setText("");
   };
 
   return (
-    <div style={{ display: "flex" }}>
+    <div
+      className="message-input-wrapper"
+      style={{
+        display: "flex",
+        padding: 12,
+        borderRadius: 14,
+        backdropFilter: "blur(12px)",
+        background:
+          theme === "light"
+            ? "rgba(255,255,255,0.55)"
+            : "rgba(20,20,20,0.55)",
+        border:
+          theme === "light"
+            ? "1px solid rgba(200,220,255,0.6)"
+            : "1px solid rgba(255,255,255,0.15)",
+      }}
+    >
+      {/* 输入框 */}
       <Input
         size="large"
-        placeholder="在这里输入您的问题..."
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onPressEnter={handleSend}
+        value={text}
+        placeholder={t.inputPlaceholder}   // ⭐ 国际化 placeholder
+        onPressEnter={send}
         disabled={disabled}
+        onChange={(e) => setText(e.target.value)}
+        style={{
+          borderRadius: 10,
+          background: theme === "light" ? "#ffffff" : "#2a2a33",
+        }}
       />
+
+      {/* 发送按钮 */}
       <Button
         type="primary"
-        size="large"
-        icon={<SendOutlined />}
-        style={{ marginLeft: "8px" }}
-        onClick={handleSend}
         disabled={disabled}
-        loading={disabled}
+        icon={<SendOutlined />}
+        onClick={send}
+        style={{
+          marginLeft: 12,
+          padding: "0 22px",
+          borderRadius: 10,
+          background:
+            theme === "light"
+              ? "linear-gradient(135deg,#6ea8ff,#a181ff)"
+              : "linear-gradient(135deg,#4c8eff,#6a5cff,#3778ff)",
+          border: "none",
+        }}
       >
-        发送
+        {t.send}   {/* ⭐ 国际化按钮 */}
       </Button>
     </div>
   );
-};
-
-export default MessageInput;
+}

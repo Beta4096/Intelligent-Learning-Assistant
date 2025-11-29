@@ -1,58 +1,51 @@
-// src/components/MessageList.js
-
-import React, { useEffect, useRef } from "react";
+import React from "react";
+import "./MessageList.css";
 import { Avatar } from "antd";
 import { UserOutlined, RobotOutlined } from "@ant-design/icons";
-import "./MessageList.css";
 
-const MessageList = (props) => {
-  const {
-    messages = [],
-    isTyping = false,
-    typingText = "",
-  } = props || {};
-
-  const endRef = useRef(null);
-
-  const scrollToBottom = () => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(scrollToBottom, [messages, isTyping, typingText]);
-
+export default function MessageList({ messages, isTyping, t }) {
   return (
-    <div className="chat-container">
+    <div className="message-list-wrapper">
       {messages.map((msg) => (
         <div
           key={msg.id}
-          className={`chat-message ${msg.sender === "user" ? "user" : "ai"}`}
+          className={`chat-msg ${msg.sender === "user" ? "user" : "ai"}`}
         >
-          <Avatar
-            className="chat-avatar"
-            icon={msg.sender === "user" ? <UserOutlined /> : <RobotOutlined />}
-            style={{
-              backgroundColor:
-                msg.sender === "user" ? "#1677ff" : "#10b981",
-            }}
-          />
-          <div className="chat-bubble">{msg.text}</div>
+          {/* 左侧 AI 头像 */}
+          {msg.sender === "ai" && (
+            <Avatar
+              className="avatar"
+              icon={<RobotOutlined />}
+              style={{ backgroundColor: "#4f67ff" }}
+            />
+          )}
+
+          {/* 气泡 */}
+          <div className="bubble">{msg.text}</div>
+
+          {/* 用户头像在右侧 */}
+          {msg.sender === "user" && (
+            <Avatar
+              className="avatar"
+              icon={<UserOutlined />}
+              style={{ backgroundColor: "#3da5ff" }}
+            />
+          )}
         </div>
       ))}
 
+      {/* AI 输入中 */}
       {isTyping && (
-        <div className="chat-message ai">
+        <div className="chat-msg ai">
           <Avatar
-            className="chat-avatar"
+            className="avatar"
             icon={<RobotOutlined />}
-            style={{ backgroundColor: "#10b981" }}
+            style={{ backgroundColor: "#4f67ff" }}
           />
-          <div className="chat-bubble typing-effect">{typingText}</div>
+          {/* 保持你原本的“···” */}
+          <div className="bubble typing">···</div>
         </div>
       )}
-
-      <div ref={endRef}></div>
     </div>
   );
-};
-
-export default MessageList;
+}
