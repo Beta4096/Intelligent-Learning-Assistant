@@ -1,63 +1,75 @@
-import React from 'react';
-import { Button, Card, Form, Input } from 'antd';
-import { useNavigate, Link } from 'react-router-dom';
+// src/pages/LoginPage.js
+
+import React, { useState } from "react";
+import { Input, Button, message } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import { loginUser } from "../services/api";
+import "./AuthPage.css";
 
 const LoginPage = ({ onLogin }) => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const onFinish = (values) => {
-    console.log('登录信息:', values);
-    
-    onLogin();
-    
-    navigate('/chat'); 
+  const handleLogin = async () => {
+    if (!username || !password) {
+      return message.error("请输入用户名和密码");
+    }
+
+    // 调用 json-server mock 登录
+    const res = await loginUser(username, password);
+
+    if (res.success) {
+      message.success("登录成功");
+
+      // 🌟 关键！把 token 和 history 传回给 App.js
+      if (onLogin) {
+        onLogin(res.token, res.history);
+      }
+
+      localStorage.setItem("token", res.token);
+
+      navigate("/chat");
+    } else {
+      message.error(res.msg || "登录失败");
+    }
   };
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      height: '100vh', 
-      backgroundImage: `url('/assets/background.png')`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center' 
-    }}>
-      <Card title="欢迎登录" style={{ width: 400 }}>
-        {}
-        <Form
-          name="login"
-          onFinish={onFinish}
-          autoComplete="off"
-          layout="vertical"
+    <div className="auth-container">
+      <div className="glass-card">
+        <h1 className="auth-title">欢迎回来</h1>
+        <p className="auth-subtitle">登录你的智能学习助手</p>
+
+        <Input
+          className="auth-input"
+          size="large"
+          placeholder="用户名（随便填）"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+
+        <Input.Password
+          className="auth-input"
+          size="large"
+          placeholder="密码（随便填）"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <Button
+          type="primary"
+          className="auth-button"
+          size="large"
+          onClick={handleLogin}
         >
-          <Form.Item
-            label="用户名"
-            name="username"
-            rules={[{ required: true, message: '请输入用户名!' }]}
-          >
-            <Input placeholder="请输入你的用户名" />
-          </Form.Item>
+          登录
+        </Button>
 
-          <Form.Item
-            label="密码"
-            name="password"
-            rules={[{ required: true, message: '请输入密码!' }]}
-          >
-            <Input.Password placeholder="请输入你的密码" />
-          </Form.Item>
-          
-          <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
-              登录
-            </Button>
-          </Form.Item>
-
-          <Form.Item style={{ textAlign: 'center', marginBottom: 0 }}>
-            <Link to="/register">还没有账户？立即注册</Link>
-          </Form.Item>
-        </Form>
-      </Card>
+        <p className="auth-footer">
+          还没有账号？ <Link to="/register">立即注册</Link>
+        </p>
+      </div>
     </div>
   );
 };

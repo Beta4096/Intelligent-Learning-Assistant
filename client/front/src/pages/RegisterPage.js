@@ -1,90 +1,74 @@
-import React from 'react';
-import { Button, Card, Form, Input, message } from 'antd';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { Input, Button, message } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import { registerUser } from "../services/api";
+import "./AuthPage.css";
 
 const RegisterPage = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
-  const onFinish = (values) => {
-    console.log('收到的注册信息:', values);
-    message.success('恭喜你，注册成功！即将跳转到登录页...');
-    setTimeout(() => {
-      navigate('/login');
-    }, 1500);
+  const handleRegister = async () => {
+    if (!username || !password)
+      return message.error("请填写完整信息");
+
+    if (password !== confirmPassword)
+      return message.error("两次密码不一致");
+
+    const res = await registerUser(username, password, confirmPassword);
+    if (res.success) {
+      message.success("注册成功，请登录");
+      navigate("/login");
+    } else {
+      message.error(res.msg || "注册失败");
+    }
   };
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      height: '100vh', 
-      backgroundImage: `url('/assets/background.png')`, 
-      backgroundSize: 'cover',
-      backgroundPosition: 'center' 
-    }}>
-      
-      {/*  */}
-      <Card title="创建一个新账户" style={{ width: 400 }}>
-        <Form
-          name="register"
-          onFinish={onFinish}
-          autoComplete="off"
-          layout="vertical"
+    <div className="auth-container">
+      <div className="glass-card">
+        <h1 className="auth-title">注册账号</h1>
+        <p className="auth-subtitle">加入智能学习助手</p>
+
+        <Input
+          className="auth-input"
+          size="large"
+          placeholder="设置用户名"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+
+        <Input.Password
+          className="auth-input"
+          size="large"
+          placeholder="设置密码"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <Input.Password
+          className="auth-input"
+          size="large"
+          placeholder="确认密码"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+
+        <Button
+          type="primary"
+          className="auth-button"
+          size="large"
+          onClick={handleRegister}
         >
-          {/* 用户名输入项 */}
-          <Form.Item
-            label="用户名"
-            name="username"
-            rules={[{ required: true, message: '用户名是必填项!' }]}
-          >
-            <Input placeholder="请输入你的用户名" />
-          </Form.Item>
+          注册
+        </Button>
 
-          {/* 密码输入项 */}
-          <Form.Item
-            label="密码"
-            name="password"
-            rules={[{ required: true, message: '密码是必填项!' }]}
-            hasFeedback
-          >
-            <Input.Password placeholder="请输入你的密码" />
-          </Form.Item>
-
-          {/* 确认密码输入项 */}
-          <Form.Item
-            label="确认密码"
-            name="confirm"
-            dependencies={['password']}
-            hasFeedback
-            rules={[
-              { required: true, message: '请再次输入你的密码!' },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue('password') === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error('两次输入的密码不一致!'));
-                },
-              }),
-            ]}
-          >
-            <Input.Password placeholder="请确认你的密码" />
-          </Form.Item>
-
-          {/* 注册按钮 */}
-          <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
-              立即注册
-            </Button>
-          </Form.Item>
-
-          {/* 跳转到登录页的链接 */}
-          <Form.Item style={{ textAlign: 'center', marginBottom: 0 }}>
-            <Link to="/login">已经有账户了？返回登录</Link>
-          </Form.Item>
-        </Form>
-      </Card>
+        <p className="auth-footer">
+          已有账号？ <Link to="/login">返回登录</Link>
+        </p>
+      </div>
     </div>
   );
 };

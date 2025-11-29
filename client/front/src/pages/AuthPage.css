@@ -1,0 +1,86 @@
+/* 全屏背景 */
+.auth-container {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(
+    135deg,
+    #6dd5ed,
+    #2193b0,
+    #b993d6,
+    #8ca6db
+  );
+  background-size: 400% 400%;
+  animation: bgAnimation 12s ease infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 背景动画 */
+@keyframes bgAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 玻璃拟态卡片 */
+.glass-card {
+  width: 380px;
+  padding: 40px 32px;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
+  text-align: center;
+  color: white;
+  animation: fadeInUp 0.6s ease;
+}
+
+/* 卡片进入动画 */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* 标题 */
+.auth-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+/* 副标题 */
+.auth-subtitle {
+  font-size: 15px;
+  opacity: 0.8;
+  margin-bottom: 30px;
+}
+
+/* 输入框 */
+.auth-input {
+  margin-bottom: 18px;
+  border-radius: 10px !important;
+  background: rgba(255,255,255,0.6);
+}
+
+/* 登录 / 注册按钮 */
+.auth-button {
+  width: 100%;
+  height: 45px;
+  border-radius: 10px !important;
+  font-size: 16px;
+  background: linear-gradient(135deg, #6dd5ed, #2193b0);
+  border: none;
+}
+
+/* hover 动画 */
+.auth-button:hover {
+  opacity: 0.9;
+}
+
+/* 底部文字 */
+.auth-footer {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #fff;
+}

@@ -1,37 +1,64 @@
-import React from 'react';
-import { Upload, Button, List, Typography, Divider } from 'antd';
-import { UploadOutlined, FilePdfOutlined, FileTextOutlined } from '@ant-design/icons';
+import React from "react";
+import { Upload, Button, List, Typography, Popconfirm } from "antd";
+import {
+  UploadOutlined,
+  FilePdfOutlined,
+  FileImageOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 
-const { Title } = Typography;
+import "./Sidebar.css";
 
-const Sidebar = ({ uploadedFiles, onFileUpload }) => {
-  const props = {
-    beforeUpload: file => {
+const { Text } = Typography;
+
+const Sidebar = ({ uploadedFiles = [], onFileUpload, onDeleteFile }) => {
+  const uploadProps = {
+    beforeUpload: (file) => {
       onFileUpload(file);
-      return false;
+      return false; // 阻止自动上传，让我们自己处理
     },
-    showUploadList: false,
+  };
+
+  const getFileIcon = (name) => {
+    const ext = name.split(".").pop().toLowerCase();
+    if (["png", "jpg", "jpeg", "gif"].includes(ext))
+      return <FileImageOutlined className="file-icon" />;
+    if (["pdf"].includes(ext))
+      return <FilePdfOutlined className="file-icon red" />;
+    return <FilePdfOutlined className="file-icon" />;
   };
 
   return (
-    <div>
-      <Title level={4}>我的教材库</Title>
-      <Upload {...props}>
-        <Button icon={<UploadOutlined />} style={{ width: '100%' }}>
-          上传新教材
+    <div className="sidebar-container">
+      <h2 className="sidebar-title">📚 我的教材</h2>
+
+      <Upload {...uploadProps} showUploadList={false}>
+        <Button className="upload-btn" icon={<UploadOutlined />}>
+          上传教材
         </Button>
       </Upload>
-      <Divider />
+
       <List
-        header={<div>已上传文件</div>}
+        className="file-list"
         dataSource={uploadedFiles}
-        renderItem={item => (
-          <List.Item>
+        locale={{ emptyText: "暂无上传文件" }}
+        renderItem={(item) => (
+          <List.Item
+            className="file-item"
+            actions={[
+              <Popconfirm
+                title="确认删除此文件吗？"
+                onConfirm={() => onDeleteFile && onDeleteFile(item)}
+                okText="删除"
+                cancelText="取消"
+              >
+                <DeleteOutlined className="delete-btn" />
+              </Popconfirm>,
+            ]}
+          >
             <List.Item.Meta
-              avatar={item.name.endsWith('.pdf') ? <FilePdfOutlined /> : <FileTextOutlined />}
-              // 将 <a> 标签修改为 <span>
-              title={<span>{item.name}</span>}
-              description={item.status === 'uploading' ? '上传中...' : item.status === 'error' ? '上传失败' : ''}
+              avatar={getFileIcon(item.name)}
+              title={<Text className="file-name">{item.name}</Text>}
             />
           </List.Item>
         )}
