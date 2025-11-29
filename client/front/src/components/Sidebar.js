@@ -1,9 +1,14 @@
+// src/components/Sidebar.js
+
 import React from "react";
-import { Upload, Button, List, Typography, Popconfirm } from "antd";
+import { Upload, Button, List, Typography, Popconfirm, message } from "antd";
 import {
   UploadOutlined,
   FilePdfOutlined,
   FileImageOutlined,
+  FileWordOutlined,
+  FileExcelOutlined,
+  FilePptOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
 
@@ -11,32 +16,80 @@ import "./Sidebar.css";
 
 const { Text } = Typography;
 
-const Sidebar = ({ uploadedFiles = [], onFileUpload, onDeleteFile, t }) => {
+// 🔥 支持的所有 MIME 类型
+const allowedTypes = [
+  // PDF
+  "application/pdf",
+
+  // Images
+  "image/png",
+  "image/jpg",
+  "image/jpeg",
+  "image/webp",
+  "image/bmp",
+
+  // Word
+  "application/msword", // .doc
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+
+  // PowerPoint
+  "application/vnd.ms-powerpoint", // .ppt
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
+
+  // Excel
+  "application/vnd.ms-excel", // .xls
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+];
+
+export default function Sidebar({
+  uploadedFiles = [],
+  onFileUpload,
+  onDeleteFile,
+}) {
+  // 上传前验证
   const uploadProps = {
     beforeUpload: (file) => {
-      onFileUpload(file);
-      return false; // 阻止自动上传，让我们自己处理
+      if (!allowedTypes.includes(file.type)) {
+        message.error("仅支持 PDF / 图片 / Word / PPT / Excel 文件");
+        return false;
+      }
+
+      if (onFileUpload) onFileUpload(file);
+      return false; // 阻止自动上传 (交由 onFileUpload 处理)
     },
   };
 
-  const getFileIcon = (name) => {
+  // 图标选择器
+  const getFileIcon = (name, type) => {
     const ext = name.split(".").pop().toLowerCase();
-    if (["png", "jpg", "jpeg", "gif"].includes(ext))
+
+    if (["png", "jpg", "jpeg", "gif", "bmp", "webp"].includes(ext))
       return <FileImageOutlined className="file-icon" />;
-    if (["pdf"].includes(ext))
+
+    if (ext === "pdf")
       return <FilePdfOutlined className="file-icon red" />;
+
+    if (ext === "doc" || ext === "docx")
+      return <FileWordOutlined className="file-icon blue" />;
+
+    if (ext === "ppt" || ext === "pptx")
+      return <FilePptOutlined className="file-icon orange" />;
+
+    if (ext === "xls" || ext === "xlsx")
+      return <FileExcelOutlined className="file-icon green" />;
+
+    // 默认 PDF 图标
     return <FilePdfOutlined className="file-icon" />;
   };
 
   return (
     <div className="sidebar-container">
-      {/* 标题 */}
-      <h2 className="sidebar-title">📚 {t.uploadTextbook}</h2>
+      <h2 className="sidebar-title">📚 我的教材</h2>
 
       {/* 上传按钮 */}
       <Upload {...uploadProps} showUploadList={false}>
         <Button className="upload-btn" icon={<UploadOutlined />}>
-          {t.uploadTextbook}
+          上传文件
         </Button>
       </Upload>
 
@@ -44,16 +97,16 @@ const Sidebar = ({ uploadedFiles = [], onFileUpload, onDeleteFile, t }) => {
       <List
         className="file-list"
         dataSource={uploadedFiles}
-        locale={{ emptyText: t.noFiles || "No files" }}  // 国际化"暂无上传文件"
+        locale={{ emptyText: "暂无上传文件" }}
         renderItem={(item) => (
           <List.Item
             className="file-item"
             actions={[
               <Popconfirm
-                title={t.confirmDelete || "Confirm delete this file?"}
+                title="确认删除此文件吗？"
                 onConfirm={() => onDeleteFile && onDeleteFile(item)}
-                okText={t.delete || "Delete"}
-                cancelText={t.cancel || "Cancel"}
+                okText="删除"
+                cancelText="取消"
               >
                 <DeleteOutlined className="delete-btn" />
               </Popconfirm>,
@@ -68,6 +121,4 @@ const Sidebar = ({ uploadedFiles = [], onFileUpload, onDeleteFile, t }) => {
       />
     </div>
   );
-};
-
-export default Sidebar;
+}

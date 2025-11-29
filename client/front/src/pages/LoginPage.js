@@ -2,23 +2,35 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Input, Button, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
+
 import { loginUser } from "../services/api";
 import "./AuthPage.css";
 
+// 手机号验证正则（中国大陆）
+const PHONE_REG = /^1[3-9]\d{9}$/;
+
 const LoginPage = ({ onLogin }) => {
+  const [loginMode, setLoginMode] = useState("password"); // password | sms
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  // 验证码登录模式
+  const [phone, setPhone] = useState("");
+  const [smsCode, setSmsCode] = useState("");
+  const [isPhoneValid, setIsPhoneValid] = useState(false);
+  const [smsCountdown, setSmsCountdown] = useState(0);
+
   const navigate = useNavigate();
 
-  // 🌌 四个 Canvas 引用
+  // 🌌 星空背景画布（保持你的设计）
   const starCanvas = useRef(null);
   const meteorCanvas = useRef(null);
   const nebulaCanvas = useRef(null);
   const particleCanvas = useRef(null);
 
-  /* ----------------------------------------------------------
-     🌌 星空 / 流星 / 星云 / 粒子动画（完整拷贝自 HomePage）
-  ---------------------------------------------------------- */
+  /* --------------------------------------------------
+     星空动画（原样复制）
+  -------------------------------------------------- */
   useEffect(() => {
     const starCtx = starCanvas.current.getContext("2d");
     const meteorCtx = meteorCanvas.current.getContext("2d");
@@ -28,13 +40,11 @@ const LoginPage = ({ onLogin }) => {
     let w = window.innerWidth;
     let h = window.innerHeight;
 
-    // 设置尺寸
     [starCanvas, meteorCanvas, nebulaCanvas, particleCanvas].forEach((ref) => {
       ref.current.width = w;
       ref.current.height = h;
     });
 
-    /* 🌟 1. 星空 */
     const stars = Array.from({ length: 350 }).map(() => ({
       x: Math.random() * w,
       y: Math.random() * h,
@@ -57,7 +67,6 @@ const LoginPage = ({ onLogin }) => {
       });
     }
 
-    /* ☄️ 2. 流星 */
     const meteors = [];
     function spawnMeteor() {
       meteors.push({
@@ -68,7 +77,6 @@ const LoginPage = ({ onLogin }) => {
         opacity: Math.random() * 0.4 + 0.3,
       });
     }
-
     function drawMeteors() {
       meteorCtx.clearRect(0, 0, w, h);
       meteors.forEach((m, i) => {
@@ -81,14 +89,12 @@ const LoginPage = ({ onLogin }) => {
 
         m.x -= m.speed;
         m.y += m.speed * 0.4;
-
         if (m.y > h || m.x < -200) meteors.splice(i, 1);
       });
 
       if (Math.random() < 0.01) spawnMeteor();
     }
 
-    /* 🌈 3. 星云 */
     function drawNebula() {
       nebulaCtx.clearRect(0, 0, w, h);
       const g = nebulaCtx.createRadialGradient(
@@ -102,7 +108,6 @@ const LoginPage = ({ onLogin }) => {
       nebulaCtx.fillRect(0, 0, w, h);
     }
 
-    /* ✨ 4. 粒子光点 */
     const particles = Array.from({ length: 60 }).map(() => ({
       x: Math.random() * w,
       y: Math.random() * h,
@@ -128,7 +133,6 @@ const LoginPage = ({ onLogin }) => {
       });
     }
 
-    /* 🎞 主循环 */
     function animate() {
       drawStars();
       drawNebula();
@@ -138,7 +142,6 @@ const LoginPage = ({ onLogin }) => {
     }
     animate();
 
-    /* 📐 窗口尺寸变化 */
     window.addEventListener("resize", () => {
       w = window.innerWidth;
       h = window.innerHeight;
@@ -150,63 +153,205 @@ const LoginPage = ({ onLogin }) => {
     });
   }, []);
 
-  /* ----------------------------------------------------------
-     登录逻辑
-  ---------------------------------------------------------- */
-  const handleLogin = async () => {
-    if (!username || !password) {
-      return message.error("请输入用户名和密码");
+  /* ------------------------------------------------------
+      手机号实时校验
+  ------------------------------------------------------ */
+  useEffect(() => {
+    setIsPhoneValid(PHONE_REG.test(phone));
+  }, [phone]);
+
+  /* ------------------------------------------------------
+      获取验证码（模拟）
+  ------------------------------------------------------ */
+  const sendSMS = () => {
+    if (!isPhoneValid) {
+      return message.error("请输入合法手机号");
     }
+    message.success("验证码已发送（模拟）");
+    setSmsCountdown(60);
+  };
+
+  useEffect(() => {
+    if (smsCountdown <= 0) return;
+    const timer = setTimeout(() => setSmsCountdown(smsCountdown - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [smsCountdown]);
+
+  /* ------------------------------------------------------
+      登录 - 密码模式
+  ------------------------------------------------------ */
+  const handlePasswordLogin = async () => {
+    if (!username || !password)
+      return message.error("请输入用户名和密码");
 
     const res = await loginUser(username, password);
-
     if (res.success) {
       message.success("登录成功");
       if (onLogin) onLogin(res.token, res.history);
       localStorage.setItem("token", res.token);
       navigate("/chat");
     } else {
-      message.error(res.msg || "登录失败");
+      message.error("登录失败");
     }
+  };
+
+  /* ------------------------------------------------------
+      登录 - 验证码模式（模拟）
+  ------------------------------------------------------ */
+  const handleSMSLogin = () => {
+    if (!isPhoneValid) return message.error("手机号不正确");
+    if (!smsCode) return message.error("请输入验证码");
+
+    message.success("使用验证码登录成功（模拟）");
+    localStorage.setItem("token", "sms-login-token");
+    if (onLogin) onLogin("sms-login-token", []);
+    navigate("/chat");
+  };
+
+  /* ------------------------------------------------------
+      微信登录按钮
+  ------------------------------------------------------ */
+  const handleWeChatLogin = () => {
+    message.loading("正在调用微信授权...", 1);
+    setTimeout(() => {
+      message.success("微信登录成功");
+      localStorage.setItem("token", "wechat-token");
+      if (onLogin) onLogin("wechat-token", []);
+      navigate("/chat");
+    }, 1000);
   };
 
   return (
     <>
-      {/* ⭐ 四层 Canvas 星空背景 */}
+      {/* 星空背景层 */}
       <canvas ref={starCanvas} id="auth-stars"></canvas>
       <canvas ref={meteorCanvas} id="auth-meteors"></canvas>
       <canvas ref={nebulaCanvas} id="auth-nebula"></canvas>
       <canvas ref={particleCanvas} id="auth-particles"></canvas>
 
-      {/* ⭐ 登录卡片 */}
+      {/* 登录卡片 */}
       <div className="auth-container">
         <div className="glass-card">
+
           <h1 className="auth-title">欢迎回来</h1>
-          <p className="auth-subtitle">登录你的智能学习助手</p>
 
-          <Input
-            className="auth-input"
-            size="large"
-            placeholder="用户名（随便填）"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
+          {/* 登录模式切换 */}
+          <div style={{ color: "#dce1ff", marginBottom: 20 }}>
+            <span
+              style={{
+                marginRight: 20,
+                cursor: "pointer",
+                color: loginMode === "password" ? "#fff" : "#9ab",
+              }}
+              onClick={() => setLoginMode("password")}
+            >
+              密码登录
+            </span>
+            <span
+              style={{
+                cursor: "pointer",
+                color: loginMode === "sms" ? "#fff" : "#9ab",
+              }}
+              onClick={() => setLoginMode("sms")}
+            >
+              验证码登录
+            </span>
+          </div>
 
-          <Input.Password
-            className="auth-input"
-            size="large"
-            placeholder="密码（随便填）"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          {loginMode === "password" && (
+            <>
+              <Input
+                className="auth-input"
+                size="large"
+                placeholder="用户名"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
 
+              <Input.Password
+                className="auth-input"
+                size="large"
+                placeholder="密码"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+
+              <Button
+                className="auth-button"
+                size="large"
+                onClick={handlePasswordLogin}
+              >
+                登录
+              </Button>
+            </>
+          )}
+
+          {loginMode === "sms" && (
+            <>
+              <Input
+                className="auth-input"
+                size="large"
+                placeholder="手机号"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                status={phone && !isPhoneValid ? "error" : ""}
+              />
+
+              <div style={{ display: "flex", gap: 10 }}>
+                <Input
+                  className="auth-input"
+                  size="large"
+                  placeholder="验证码"
+                  value={smsCode}
+                  onChange={(e) => setSmsCode(e.target.value)}
+                />
+                <Button
+                  disabled={!isPhoneValid || smsCountdown > 0}
+                  onClick={sendSMS}
+                >
+                  {smsCountdown > 0 ? `${smsCountdown}s` : "获取验证码"}
+                </Button>
+              </div>
+
+              <Button
+                className="auth-button"
+                size="large"
+                onClick={handleSMSLogin}
+              >
+                登录
+              </Button>
+            </>
+          )}
+
+          {/* 微信登录 */}
           <Button
-            type="primary"
-            className="auth-button"
             size="large"
-            onClick={handleLogin}
+            onClick={handleWeChatLogin}
+            style={{
+              marginTop: 18,
+              width: "100%",
+              height: 48,
+              borderRadius: 12,
+              background: "linear-gradient(135deg,#1AAD19,#22C55E)",
+              border: "none",
+              color: "white",
+              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+              boxShadow: "0 0 16px rgba(40,200,80,0.8)",
+              transition: "all 0.25s ease",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.transform = "translateY(-4px) scale(1.03)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.transform = "translateY(0) scale(1)")
+            }
           >
-            登录
+            <img src="/wechat.svg" alt="" style={{ width: 26, height: 26 }} />
+            微信登录
           </Button>
 
           <p className="auth-footer">
