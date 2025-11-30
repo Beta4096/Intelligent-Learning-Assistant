@@ -104,3 +104,7 @@ def delete(token,file_path):
         return {"success": True,"msg": "删除成功！"}
     else:
         return {"success": False,"msg": "删除失败！"}
+
+if __name__ == "__main__":
+    result1 = upload_file("SiLYigvhDksLwNbOhiIpNdzYsj_OIizGt6InkdxYoPg", "D:\APP\QQ\QQ_File\example.pdf")
+    print(f"结果: {result1}\n")

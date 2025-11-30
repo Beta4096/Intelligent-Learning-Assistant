@@ -24,6 +24,7 @@ TestResults.xml
 #.envs
 *.env
 
+./client/front/node_modules
 
 .venv/
 

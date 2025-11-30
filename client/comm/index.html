@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>上传教材 Demo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <h1>上传教材（调用 /api/upload-textbook）</h1>
+
+    <div class="form-group">
+      <label for="token">Token：</label>
+      <input
+        type="text"
+        id="token"
+        placeholder="在这里粘贴你的 token"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="filePath">文件路径（服务器路径）：</label>
+      <input
+        type="text"
+        id="filePath"
+        placeholder="例如：E:/docs/xxx.pdf"
+      />
+    </div>
+
+    <button id="uploadBtn">上传教材</button>
+
+    <div id="result" class="result"></div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
