@@ -106,5 +106,5 @@ def delete(token,file_path):
         return {"success": False,"msg": "删除失败！"}
 
 if __name__ == "__main__":
-    result1 = upload_file("SiLYigvhDksLwNbOhiIpNdzYsj_OIizGt6InkdxYoPg", "D:\APP\QQ\QQ_File\example.pdf")
+    result1 = upload_file("SiLYigvhDksLwNbOhiIpNdzYsj_OIizGt6InkdxYoPg", "E:\OOAD\OOAD Project EN.pdf")
     print(f"结果: {result1}\n")

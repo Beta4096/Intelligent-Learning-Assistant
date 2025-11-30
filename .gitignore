@@ -24,8 +24,10 @@ TestResults.xml
 #.envs
 *.env
 
-./client/front/node_modules
-
+client/front/node_modules
+server/comm/uploaded_pdfs
+server/comm/chroma_db_production/
+client/comm/textbook/
 .venv/
 
 .idea/
