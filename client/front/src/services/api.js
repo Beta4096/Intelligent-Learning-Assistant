@@ -1,57 +1,95 @@
+// src/services/api.js
 const API_BASE = "http://localhost:8080/api";
 
-// 通用封装
-async function postJSON(url, body) {
+// -----------------------------
+// 通用请求封装
+// -----------------------------
+export async function postJSON(url, body) {
   const res = await fetch(`${API_BASE}${url}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body)
   });
-  return res.json();
+  return await res.json();
 }
-async function postFormData(url, formData) {
+
+export async function postFormData(url, formData) {
   const res = await fetch(`${API_BASE}${url}`, {
     method: "POST",
-    body: formData,
+    body: formData
   });
-  return res.json();
+  return await res.json();
 }
 
-const reg = await postJSON("/auth", { //注册
-  type: "register",
-  username: "alice",
-  password: "p@ssw0rd",
-  confirm_password: "p@ssw0rd"
-});
 
-const login = await postJSON("/auth", {//登录
-  type: "login",
-  username: "alice",
-  password: "p@ssw0rd",
-  confirm_password: "p@ssw0rd" 
-});
-
-const form = new FormData();
-form.append("token", "<user_token>");
-form.append("file", file);  // file 是前端传入的 File 对象
-
-const up = await postFormData("/upload-textbook", form);
+// -----------------------------
+// 注册
+// -----------------------------
+export async function register(username, password, confirm_password) {
+  return await postJSON("/auth", {
+    type: "register",
+    username,
+    password,
+    confirm_password
+  });
+}
 
 
-const del = await postJSON("/delete-textbook", {//删除教材
-  token: "<user_token>",
-  path: "D:/project/textbook/xxx(1).pdf"   // 需要能定位到本地复制的那份
-});
+// -----------------------------
+// 登录
+// -----------------------------
+export async function login(username, password) {
+  return await postJSON("/auth", {
+    type: "login",
+    username,
+    password,
+    confirm_password: password   // 兼容你服务器结构
+  });
+}
 
-const qa = await postJSON("/question", {//问问题
-  token: "<user_token>",
-  text: "请解析第 3 题。",
-  images: [
-    "E:/docs/math/q3.png",
-    "E:/docs/math/step2.jpg"
-  ]
-});
 
-const ex = await postJSON("/export",{
-  token: "<user_token>",
-});
+// -----------------------------
+// 上传教材
+// file: 前端 <input type="file"> 选出来的 File 对象
+// -----------------------------
+export async function uploadTextbook(token, file) {
+  const form = new FormData();
+  form.append("token", token);
+  form.append("file", file);
+  return await postFormData("/upload-textbook", form);
+}
+
+
+// -----------------------------
+// 删除教材（不再使用 path）
+// file_id 是客户端存 meta 里解析出的
+// -----------------------------
+export async function deleteTextbook(token, file_id) {
+  return await postJSON("/delete-textbook", {
+    token,
+    file_id // 新版不再需要路径
+  });
+}
+
+
+// -----------------------------
+// 问题（支持图片）
+// images: File[] 或 base64[] 都行，看你的前端处理方式
+// -----------------------------
+export async function askQuestion(token, text, images = []) {
+  return await postJSON("/question", {
+    token,
+    text,
+    images
+  });
+}
+
+
+// -----------------------------
+// 导出到 Notion
+// -----------------------------
+export async function exportToNotion(token) {
+  return await postJSON("/export", {
+    token
+  });
+}

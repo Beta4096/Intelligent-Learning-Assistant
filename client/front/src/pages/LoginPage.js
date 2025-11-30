@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Input, Button, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
+import { postJSON } from "../services/api";
 
 import { loginUser } from "../services/api";
 import "./AuthPage.css";

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Input, Button, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../services/api";
+import { postJSON } from "../services/api";
 
 import "./AuthPage.css";
 

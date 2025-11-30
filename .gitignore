@@ -23,6 +23,8 @@ TestResults.xml
 
 #.envs
 *.env
+__pycache__/
+*.pyc
 
 client/front/node_modules
 server/comm/uploaded_pdfs
