@@ -181,19 +181,37 @@ const LoginPage = ({ onLogin }) => {
       登录 - 密码模式
   ------------------------------------------------------ */
   const handlePasswordLogin = async () => {
-    if (!username || !password)
-      return message.error("请输入用户名和密码");
+  if (!username || !password)
+    return message.error("请输入用户名和密码");
 
-    const res = await loginUser(username, password);
-    if (res.success) {
-      message.success("登录成功");
-      if (onLogin) onLogin(res.token, res.history);
-      localStorage.setItem("token", res.token);
-      navigate("/chat");
-    } else {
-      message.error("登录失败");
-    }
-  };
+  const res = await postJSON("/auth", {
+    type: "login",
+    username,
+    password,
+    confirm_password: password, // 你的后端要求带这个
+  });
+
+  // 后端返回结构：
+  // {
+  //   "type": "history",
+  //   "status": 200,
+  //   "token": "T-fake-login-token",
+  //   ...
+  // }
+
+  if (res.status === 200 && res.token) {
+    message.success("登录成功");
+
+    // ⭐ 保存 token
+    localStorage.setItem("token", res.token);
+
+    // ⭐ 跳转聊天页面
+    navigate("/chat");
+  } else {
+    message.error("登录失败");
+  }
+};
+
 
   /* ------------------------------------------------------
       登录 - 验证码模式（模拟）

@@ -43,17 +43,37 @@ const RegisterPage = () => {
   }, []);
   // ----------------------------------------------------------
 
-  const handleRegister = async () => {
-    if (!isPhoneValid) return message.error("请输入合法手机号");
-    if (!username) return message.error("请输入用户名");
-    if (!password || !confirmPassword)
-      return message.error("请输入密码");
-    if (password !== confirmPassword)
-      return message.error("两次密码不一致");
+ const handleRegister = async () => {
+  if (!isPhoneValid) return message.error("请输入合法手机号");
+  if (!username) return message.error("请输入用户名");
+  if (!password || !confirmPassword)
+    return message.error("请输入密码");
+  if (password !== confirmPassword)
+    return message.error("两次密码不一致");
 
-    message.success("注册成功（模拟）");
+  // ⭐ 调用后端注册 API
+  const res = await postJSON("/auth", {
+    type: "register",
+    username,
+    password,
+    confirm_password: confirmPassword, // 后端要求字段
+  });
+
+  // 后端注册成功表示：
+  // {
+  //   status: 200,
+  //   token: "...",  // 注册后不一定返回 token
+  //   ...
+  // }
+
+  if (res.status === 200) {
+    message.success("注册成功，请登录");
     navigate("/login");
-  };
+  } else {
+    message.error("注册失败");
+  }
+};
+
 
   return (
     <>

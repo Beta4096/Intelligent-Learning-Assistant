@@ -19,6 +19,8 @@ import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
 
 import { askQuestion, uploadTextbook } from "../services/api";
+import { postJSON } from "../services/api";
+
 import useTypingEffect from "../hooks/useTypingEffect";
 
 import { translations } from "../i18n"; // ⭐ 多语言
@@ -52,6 +54,8 @@ export default function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [aiFullReply, setAiFullReply] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+
 
   const typingText = useTypingEffect(
     isTyping ? aiFullReply : "",
@@ -160,39 +164,91 @@ export default function ChatPage() {
   // 发送消息
   // ============================
   const handleSendMessage = async (text) => {
-    if (!text.trim()) return;
+  if (!text.trim()) return;
 
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now(), sender: "user", text },
-    ]);
+  setMessages((prev) => [
+    ...prev,
+    { id: Date.now(), sender: "user", text },
+  ]);
 
-    setIsTyping(true);
+  setIsTyping(true);
 
-    const res = await askQuestion(text, [], token);
-    if (!res.success) {
-      setIsTyping(false);
-      return message.error("AI 回复失败");
-    }
+  // ⭐ 使用你自己的 API
+  const res = await postJSON("/question", {
+    token,
+    text,
+    images: []
+  });
 
-    const aiText = res.content?.text || "";
+  if (!res.success) {
+    setIsTyping(false);
+    return message.error("AI 回复失败");
+  }
 
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now() + 1, sender: "ai", text: "" },
-    ]);
+  const aiText = res.content?.text || "";
 
-    setAiFullReply(aiText);
-  };
+  setMessages((prev) => [
+    ...prev,
+    { id: Date.now() + 1, sender: "ai", text: "" },
+  ]);
+
+  setAiFullReply(aiText);
+};
+
 
   // ============================
   // 上传教材
   // ============================
   const handleUploadTextbook = async (file) => {
-    const res = await uploadTextbook(file, token);
-    if (!res.success) return message.error("上传失败");
-    message.success("上传成功");
-  };
+  const token = localStorage.getItem("token");
+
+  const formData = new FormData();
+  formData.append("token", token);
+  formData.append("file", file);  // ⭐关键：直接把 File 对象放入 FormData
+
+  try {
+    const res = await fetch("http://localhost:8080/api/upload-textbook", {
+      method: "POST",
+      body: formData, // ⭐ 不要写 Content-Type，让浏览器自动加 boundary
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      message.success("上传成功");
+
+      // 写入本地文件列表（前端展示用）
+      setUploadedFiles((prev) => [
+        ...prev,
+        { name: file.name, size: file.size }
+      ]);
+    } else {
+      message.error("上传失败: " + data.msg);
+    }
+  } catch (err) {
+    message.error("上传失败");
+  }
+};
+
+const handleDeleteFile = async (file) => {
+  const token = localStorage.getItem("token");
+
+  const res = await postJSON("/delete-textbook", {
+    token,
+    path: file.name   // ⭐ 必须是 path，符合你的 API
+  });
+
+  if (res.success) {
+    message.success("删除成功");
+    setUploadedFiles((prev) => prev.filter((f) => f.name !== file.name));
+  } else {
+    message.error("删除失败");
+  }
+};
+
+
+
+
 
   // ============================
   // ⭐ 语言切换（自动保留 token）
@@ -236,11 +292,15 @@ export default function ChatPage() {
       {/* 主体 */}
       <Layout style={{ paddingTop: HEADER_HEIGHT }}>
       <Sider width={260} className="chat-sider">
-  <Sidebar
-    onUploadTextbook={handleUploadTextbook}
-    theme={theme}
-    t={t}
-  />
+ <Sidebar
+  uploadedFiles={uploadedFiles}
+  onUploadTextbook={handleUploadTextbook}
+  onDeleteFile={handleDeleteFile}
+  theme={theme}
+  t={t}
+/>
+
+
 </Sider>
       <Content className="chat-content">
   <MessageList

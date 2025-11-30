@@ -43,22 +43,20 @@ const allowedTypes = [
 
 export default function Sidebar({
   uploadedFiles = [],
-  onFileUpload,
+  onUploadTextbook,
   onDeleteFile,
 }) {
-  // 上传前验证
   const uploadProps = {
-    beforeUpload: (file) => {
-      if (!allowedTypes.includes(file.type)) {
+    beforeUpload: (File) => {
+      if (!allowedTypes.includes(File.type)) {
         message.error("仅支持 PDF / 图片 / Word / PPT / Excel 文件");
         return false;
       }
 
-      if (onFileUpload) onFileUpload(file);
-      return false; // 阻止自动上传 (交由 onFileUpload 处理)
+      if (onUploadTextbook) onUploadTextbook(file);
+      return false;
     },
   };
-
   // 图标选择器
   const getFileIcon = (name, type) => {
     const ext = name.split(".").pop().toLowerCase();
