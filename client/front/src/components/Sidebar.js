@@ -53,7 +53,7 @@ export default function Sidebar({
         return false;
       }
 
-      if (onUploadTextbook) onUploadTextbook(File);
+      if (onUploadTextbook) onUploadTextbook(file);
       return false;
     },
   };
