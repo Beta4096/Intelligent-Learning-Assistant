@@ -133,6 +133,7 @@ function LoginPage({ onLoginSuccess }) {
 
 // ---------------- 聊天页（带文件上传） ----------------
 function ChatPage({ token, initialMessages, logout }) {
+    const [exportStatus, setExportStatus] = useState("");
   const [messages, setMessages] = useState(initialMessages);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -156,6 +157,24 @@ function ChatPage({ token, initialMessages, logout }) {
       setUploadStatus("网络错误：" + e.message);
     }
   }
+  async function handleExport() {
+  setExportStatus("导出中...");
+
+  try {
+    const res = await apiExport(token);
+
+    if (!res.success) {
+      setExportStatus("导出失败：" + (res.msg || "未知错误"));
+    } else {
+      setExportStatus(
+        `导出成功！容器页ID: ${res.container_id}, 条目ID：${res.entry_id}`
+      );
+    }
+  } catch (e) {
+    setExportStatus("网络错误：" + e.message);
+  }
+}
+
   // 将文件转为 Base64
   function fileToBase64(file) {
     return new Promise((resolve) => {
@@ -235,7 +254,20 @@ return (
     <button onClick={logout} style={{ marginBottom: 10 }}>
       退出登录
     </button>
-
+<div
+  style={{
+    border: "1px solid #aaa",
+    padding: 10,
+    borderRadius: 6,
+    marginBottom: 10,
+  }}
+>
+  <h3>导出聊天记录到 Notion</h3>
+  <button onClick={handleExport}>导出历史</button>
+  {exportStatus && (
+    <div style={{ marginTop: 6, fontSize: 14 }}>{exportStatus}</div>
+  )}
+</div>
     {/* 上传教材区域 */}
     <div
       style={{
