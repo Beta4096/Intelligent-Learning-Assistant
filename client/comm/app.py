@@ -21,12 +21,26 @@ def auth():
     )
     return jsonify(res)
 
+# @app.post("/api/upload-textbook")
+# def upload_textbook():
+#     data = request.get_json()
+#     token = data.get("token")
+#     file_path = data.get("file_path")
+#     res = upload_file(token, file_path)
+#     return jsonify(res)
+from flask import request
+
 @app.post("/api/upload-textbook")
 def upload_textbook():
-    data = request.get_json()
-    token = data.get("token")
-    file_path = data.get("file_path")
-    res = upload_file(token, file_path)
+    # 前端用 multipart/form-data 传：token + file
+    token = request.form.get("token")
+    file = request.files.get("file")
+
+    if not token or not file:
+        return jsonify({"success": False, "msg": "缺少 token 或 file"}), 400
+
+    # 直接复用你写好的 upload_file：它就是“拿文件对象”的逻辑
+    res = upload_file(token, file)
     return jsonify(res)
 
 @app.post("/api/delete-textbook")
