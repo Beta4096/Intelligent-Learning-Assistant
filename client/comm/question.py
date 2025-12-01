@@ -55,5 +55,5 @@ def upload_question(token: str, text: str = "", images=None):
         return {"success": False, "msg": "发生错误，错误类型："+str(e)}
 
 if __name__ == "__main__":
-    result1 = upload_question("SiLYigvhDksLwNbOhiIpNdzYsj_OIizGt6InkdxYoPg", "What the slides talk about Intelligent Learning Assistant Agent (RAG + Homework Tutoring)Project Description")
+    result1 = upload_question("C3xJqc-eV4cTcss3YEk9NmYJood1X1OVyZaYK8MaL5c", "What the slides talk about Intelligent Learning Assistant Agent (RAG + Homework Tutoring)Project Description")
     print(f"结果: {result1}\n")

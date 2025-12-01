@@ -17,7 +17,7 @@ def handle_question(data):
     timestamp = data["timestamp"]
     timestamp = datetime.fromtimestamp(timestamp, tz=timezone.utc)
     payload = data["payload"]
-
+    print("blueblue")
     # ========== 1. 写入用户历史记录 ==========
     db_insert("history", {
         "username": username,
@@ -39,11 +39,12 @@ def handle_question(data):
     rag_result = assistant.handle_user_query(
         user_id=username,
         query=user_text,
-        image_paths=user_image
+        image_path=user_image
     )
 
     final_answer = rag_result["final_answer"]
-    answer_timestamp = timestamp = datetime.fromtimestamp(time.time(), tz=timezone.utc)
+    print(final_answer)
+    answer_timestamp = datetime.fromtimestamp(time.time(), tz=timezone.utc)
 
 
     # ========== 3. 写入 LLM 回复历史 ==========

@@ -10,11 +10,11 @@ UPLOAD_DIR = "uploaded_pdfs"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 def handle_upload(data):
-
+    print("111")
     token = data["token"]
     check, username = verify_token(token)
     if check is not True:
-        return check
+        return username
 
     textbook = data["textbook"]
     file_name = textbook["name"]

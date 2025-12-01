@@ -155,13 +155,13 @@ def delete(token, meta_file_obj):
 
 
 if __name__ == "__main__":
-    token = "4JJq-nj6tT0FMX0uf7QjK7QciKPUNC_xVcDRGr66VZ8"
-    # with open(r"E:\OOAD\OOAD Project EN.pdf", "rb") as f:
-    #     res = upload_file(token, f)
-    #     print(res)
+    token = "C3xJqc-eV4cTcss3YEk9NmYJood1X1OVyZaYK8MaL5c"
+    with open(r"E:\OOAD\OOAD Project EN.pdf", "rb") as f:
+        res = upload_file(token, f)
+        print(res)
         # 这里 res 里可以拿到 file_id / meta_path
 
     # 删除时，用 meta 的路径
-    with open("D:\\Learn\\Lv3\\object\\sample\\Intelligent-Learning-Assistant\\client\\comm\\textbook\\1764511959931112.meta", "r", encoding="utf-8") as meta:
-        res = delete(token, meta)
-        print(res)
+    # with open("D:\\Learn\\Lv3\\object\\sample\\Intelligent-Learning-Assistant\\client\\comm\\textbook\\1764512705468726.meta", "r", encoding="utf-8") as meta:
+    #     res = delete(token, meta)
+    #     print(res)

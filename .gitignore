@@ -25,7 +25,9 @@ TestResults.xml
 *.env
 __pycache__/
 *.pyc
-
+*.pyo
+*.pyd
+*__pycache__/
 client/front/node_modules
 server/comm/uploaded_pdfs
 server/comm/chroma_db_production/
