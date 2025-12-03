@@ -18,4 +18,5 @@ def handle_login(data): #TODO
     db_insert("token", {"token": token, "TTL": time.time() + 900, "username": username})
 
     history = db_select("history","username",username)
+    print("success")
     return jsonify({"type": "history", "token": token,"history":history}), 200
