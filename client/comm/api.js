@@ -41,6 +41,7 @@ const qa = await postJSON("/question", {//问问题
     "E:/docs/math/q3.png",
     "E:/docs/math/step2.jpg"
   ]
+  session_id:"234"
 });
 
 const ex = await postJSON("/export",{

@@ -17,13 +17,15 @@ def handle_question(data):
     timestamp = data["timestamp"]
     timestamp = datetime.fromtimestamp(timestamp, tz=timezone.utc)
     payload = data["payload"]
+    session_id = data["session_id"]
     print("blueblue")
     # ========== 1. 写入用户历史记录 ==========
     db_insert("history", {
         "username": username,
         "timestamp": timestamp,
         "payload": payload,
-        "role": "user"
+        "role": "user",
+        "session_id":session_id
     })
 
     # 提取文本 & 图片
@@ -52,12 +54,14 @@ def handle_question(data):
         "username": username,
         "timestamp": answer_timestamp,
         "payload": [{"text": final_answer}],
-        "role": "LLM"
+        "role": "LLM",
+        "session_id":session_id
     })
 
     # ========== 4. 返回客户端 response ==========
     return jsonify({
         "type": "response",
         "timestamp": answer_timestamp,
-        "answer": final_answer
+        "answer": final_answer,
+        "session_id":session_id
     }), 200

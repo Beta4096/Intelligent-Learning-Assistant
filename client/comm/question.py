@@ -8,7 +8,7 @@ load_dotenv()
 SERVER_BASE_URL = os.getenv("SERVER_BASE_URL", "https://your-server.example.com")
 TIMEOUT = float(os.getenv("HTTP_TIMEOUT", "10.0"))
 
-def upload_question(token: str, text: str = "", images=None):
+def upload_question(token: str, text: str = "", images=None,session_id: int = 1):
     """
     上传“问题”，问题可以只包含文字、只包含图片，或文字+多张图片。
     图片不附带文件名
@@ -38,6 +38,7 @@ def upload_question(token: str, text: str = "", images=None):
         "type": "question",
         "token": token,
         "timestamp":question_id,
+        "session_id":session_id,
         "payload": [
             {"text": text.strip() if text else ""},
             {"image": images_b64}  # 可能是空列表
@@ -48,7 +49,7 @@ def upload_question(token: str, text: str = "", images=None):
     try:
         resp = requests.post(SERVER_BASE_URL, json=payload, timeout=TIMEOUT)
         if resp.status_code == 200:
-            return {"success": True, "msg": resp.json().get("answer")}
+            return {"success": True, "msg": {resp.json().get("answer"),resp.json().get("session_id")}}
         else:
             return {"success": False, "msg": "出错了！"}
     except requests.RequestException as e:

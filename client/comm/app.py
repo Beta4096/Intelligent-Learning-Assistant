@@ -21,13 +21,6 @@ def auth():
     )
     return jsonify(res)
 
-# @app.post("/api/upload-textbook")
-# def upload_textbook():
-#     data = request.get_json()
-#     token = data.get("token")
-#     file_path = data.get("file_path")
-#     res = upload_file(token, file_path)
-#     return jsonify(res)
 from flask import request
 
 @app.post("/api/upload-textbook")
@@ -57,7 +50,8 @@ def question_api():
     token = data.get("token")
     text = data.get("text")
     images = data.get("images", [])
-    res = upload_question(token, text, images)
+    session_id = data.get("session_id",1)
+    res = upload_question(token, text, images,session_id)
     return jsonify(res)
 
 @app.post("/api/export")
