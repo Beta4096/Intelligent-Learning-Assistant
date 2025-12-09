@@ -68,8 +68,12 @@ export default function ChatPage() {
   useEffect(() => {
     async function loadHistory() {
       try {
-        const res = await askQuestion("history", [], token);
-        if (res.type === "history" && res.content) {
+       const res = await postJSON("/question", {
+            token,
+            text: "history",
+            images: []
+          });
+        if (res.type === "history" && Array.isArray(res.content)) {
           const list = res.content.map((m, index) => {
             let text = "";
 
@@ -185,7 +189,7 @@ export default function ChatPage() {
     return message.error("AI 回复失败");
   }
 
-  const aiText = res.content?.text || "";
+  const aiText = res.msg || "";
 
   setMessages((prev) => [
     ...prev,

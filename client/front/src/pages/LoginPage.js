@@ -2,9 +2,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Input, Button, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import { postJSON } from "../services/api";
 
 import { loginUser } from "../services/api";
+import { postJSON } from "../services/api";
+
 import "./AuthPage.css";
 
 // 手机号验证正则（中国大陆）
@@ -185,32 +186,30 @@ const LoginPage = ({ onLogin }) => {
   if (!username || !password)
     return message.error("请输入用户名和密码");
 
+  // ⭐ 使用后端真实 API 格式
   const res = await postJSON("/auth", {
     type: "login",
     username,
     password,
-    confirm_password: password, // 你的后端要求带这个
+    confirm_password: password, // 后端要求字段
   });
 
-  // 后端返回结构：
-  // {
-  //   "type": "history",
-  //   "status": 200,
-  //   "token": "T-fake-login-token",
-  //   ...
-  // }
-
-  if (res.status === 200 && res.token) {
+  // ⭐ 后端登录成功条件
+  if (res.success && res.msg && res.msg.token) {
     message.success("登录成功");
-    // ⭐ 保存 token
-    localStorage.setItem("token", res.token);
 
-    // ⭐ 跳转聊天页面
+    // 保存 token
+    localStorage.setItem("token", res.msg.token);
+
+    // 保存历史消息（如果有）
+    localStorage.setItem("history", JSON.stringify(res.msg.content || []));
+
     navigate("/chat");
   } else {
-    message.error("登录失败");
+    message.error(res.msg || "登录失败");
   }
 };
+
 
 
   /* ------------------------------------------------------

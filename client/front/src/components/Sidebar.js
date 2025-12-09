@@ -47,13 +47,13 @@ export default function Sidebar({
   onDeleteFile,
 }) {
   const uploadProps = {
-    beforeUpload: (File) => {
+    beforeUpload: (file) => {
       if (!allowedTypes.includes(File.type)) {
         message.error("仅支持 PDF / 图片 / Word / PPT / Excel 文件");
         return false;
       }
 
-      if (onUploadTextbook) onUploadTextbook(File);
+      if (onUploadTextbook) onUploadTextbook(file);
       return false;
     },
   };
