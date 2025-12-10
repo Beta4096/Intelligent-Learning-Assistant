@@ -49,7 +49,8 @@ def upload_question(token: str, text: str = "", images=None,session_id: int = 1)
     try:
         resp = requests.post(SERVER_BASE_URL, json=payload, timeout=TIMEOUT)
         if resp.status_code == 200:
-            return {"success": True, "msg": {resp.json().get("answer"),resp.json().get("session_id")}}
+            return {"success": True,"msg": {"answer": resp.json().get("answer"),"session_id": resp.json().get("session_id")}}
+
         else:
             return {"success": False, "msg": "出错了！"}
     except requests.RequestException as e:

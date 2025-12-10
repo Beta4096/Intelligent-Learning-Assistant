@@ -41,7 +41,7 @@ def handle_question(data):
     rag_result = assistant.handle_user_query(
         user_id=username,
         query=user_text,
-        image_path=user_image
+        image_paths=user_image
     )
 
     final_answer = rag_result["final_answer"]
