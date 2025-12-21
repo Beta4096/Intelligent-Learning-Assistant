@@ -57,5 +57,7 @@ def upload_question(token: str, text: str = "", images=None,session_id: int = 1)
         return {"success": False, "msg": "发生错误，错误类型："+str(e)}
 
 if __name__ == "__main__":
-    result1 = upload_question("krgI-9n_edHkkfWms5aeHIS4IQ576NXWZsO7kZOoC9I", "What are the Advanced Requirements of  Intelligent Learning Assistant Agent (RAG + Homework Tutoring) according to this PDF")
-    print(f"结果: {result1}\n")
+    token = "KATYl13VMlVJUFjokFKbGuaVYJz1DtMnQ9zyYRlvbHE"
+    img = r"D:\Learn\f9a66536d84c70229af5912b44341c7a.png"
+    result = upload_question(token, "帮我解析这张图", images=img, session_id=1)
+    print(result)
