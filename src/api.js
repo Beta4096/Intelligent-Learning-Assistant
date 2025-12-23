@@ -44,11 +44,20 @@ export async function apiLogin(username, password) {
 }
 
 // 提问
-export async function apiQuestion(token, text) {
+//export async function apiQuestion(token, text) {
+//  return postJSON("/question", {
+//    token,
+//    text,
+//    images: [],
+//  });
+//}
+// api.js
+export async function apiQuestion(token, text, images = [], session_id = null) {
   return postJSON("/question", {
     token,
     text,
-    images: [],
+    images,       // 👈 直接带 base64 列表
+    session_id,   // 👈 新增：多会话标识
   });
 }
 

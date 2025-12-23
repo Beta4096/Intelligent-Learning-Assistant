@@ -6,9 +6,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SERVER_BASE_URL = os.getenv("SERVER_BASE_URL", "https://your-server.example.com")
-TIMEOUT = float(os.getenv("HTTP_TIMEOUT", "10.0"))
+TIMEOUT = float(os.getenv("HTTP_TIMEOUT", "40.0"))
 
-def upload_question(token: str, text: str = "", images=None):
+def upload_question(token: str, text: str = "", images=None,session_id: int = 1):
     """
     上传“问题”，问题可以只包含文字、只包含图片，或文字+多张图片。
     图片不附带文件名
@@ -23,27 +23,48 @@ def upload_question(token: str, text: str = "", images=None):
     else:
         image_list = [images]
 
+    # images_b64 = []
+    # for p in image_list:
+    #     # if not os.path.exists(p):
+    #     #     return {"success": False, "msg": f"图片不存在: {p}"}
+    #     with open(p, "rb") as f:
+    #         b64 = base64.b64encode(f.read()).decode("utf-8")
+    #     images_b64.append(b64)
+    #
+    # # 3) 生成问题唯一编号（也可用 uuid4().hex）
+    # question_id = time.time()
+    #
+    # payload = {
+    #     "type": "question",
+    #     "token": token,
+    #     "timestamp":question_id,
+    #     "session_id": session_id,
+    #     "payload": [
+    #         {"text": text.strip() if text else ""},
+    #         {"image": images_b64}  # 可能是空列表
+    #     ]
+    # }
     images_b64 = []
-    for p in image_list:
-        if not os.path.exists(p):
-            return {"success": False, "msg": f"图片不存在: {p}"}
-        with open(p, "rb") as f:
-            b64 = base64.b64encode(f.read()).decode("utf-8")
-        images_b64.append(b64)
-
-    # 3) 生成问题唯一编号（也可用 uuid4().hex）
     question_id = time.time()
+    if image_list:
+        for b64 in image_list:
+            if not b64:
+                continue
+            if not isinstance(b64, str):
+                return {"success": False, "msg": "images 必须是 base64 字符串列表"}
+            # 可选：做个很轻量的长度/字符检查，避免乱传
+            images_b64.append(b64)
 
     payload = {
         "type": "question",
         "token": token,
         "timestamp":question_id,
+        "session_id": session_id,
         "payload": [
             {"text": text.strip() if text else ""},
             {"image": images_b64}  # 可能是空列表
         ]
     }
-
     # 5) 发送
     try:
         resp = requests.post(SERVER_BASE_URL, json=payload, timeout=TIMEOUT)

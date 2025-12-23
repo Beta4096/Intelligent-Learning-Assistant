@@ -1,0 +1,103 @@
+.home-page-layout {
+  height: 100vh;
+  background-image: url('/public/assets/background.png'); /* 背景图路径 */
+  background-size: cover;
+  background-position: center;
+  position: relative; 
+  overflow: hidden; /* 防止内容溢出 */
+  color: white;
+}
+
+.home-page-layout::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4); /* 40% 透明度的黑色 */
+  z-index: 1;
+}
+
+.home-page-header,
+.home-page-content {
+  position: relative;
+  z-index: 2;
+  background: transparent; /* 覆盖 Ant Design 的默认背景色 */
+}
+
+.home-page-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.home-page-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0 50px;
+}
+
+.title-section {
+  margin-bottom: 60px;
+  /* 入场动画：从下方滑入并淡入 */
+  animation: slideUpFadeIn 1s ease-out forwards;
+}
+
+.main-title {
+  color: white !important; 
+  font-weight: 600 !important;
+  font-size: 3.5rem !important; /* 字体大小 */
+  text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 1.2rem !important;
+  max-width: 600px;
+  margin: 0 auto;
+  text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+.cards-section {
+  max-width: 1100px;
+  width: 100%;
+}
+
+.info-card {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); 
+  
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 12px !important;
+  color: white;
+
+  animation: slideUpFadeIn 1s ease-out 0.5s forwards; /* 延迟0.5秒开始 */
+  opacity: 0; /* 默认隐藏，等待动画 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /*  */
+}
+
+.info-card:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.info-card .ant-card-head-title,
+.info-card .ant-card-body p {
+  color: white !important;
+}
+
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

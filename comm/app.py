@@ -23,15 +23,10 @@ def auth():
 
 @app.post("/api/upload-textbook")
 def upload_textbook():
-    # 前端用 multipart/form-data 传：token + file
-    token = request.form.get("token")
-    file = request.files.get("file")
-
-    if not token or not file:
-        return jsonify({"success": False, "msg": "缺少 token 或 file"}), 400
-
-    # 直接复用你写好的 upload_file：它就是“拿文件对象”的逻辑
-    res = upload_file(token, file)
+    data = request.get_json()
+    token = data.get("token")
+    file_path = data.get("file_path")
+    res = upload_file(token, file_path)
     return jsonify(res)
 
 @app.post("/api/delete-textbook")
@@ -42,22 +37,13 @@ def delete_textbook_api():
     res = delete_textbook(token, path)
     return jsonify(res)
 
-# @app.post("/api/question")
-# def question_api():
-#     data = request.get_json()
-#     token = data.get("token")
-#     text = data.get("text")
-#     images = data.get("images", [])
-#     res = upload_question(token, text, images)
-#     return jsonify(res)
 @app.post("/api/question")
 def question_api():
     data = request.get_json()
     token = data.get("token")
     text = data.get("text")
     images = data.get("images", [])
-    session_id = data.get("session_id")  # 👈 新增
-    res = upload_question(token, text, images, session_id=session_id)  # 👈 改这里
+    res = upload_question(token, text, images)
     return jsonify(res)
 
 @app.post("/api/export")
@@ -68,4 +54,4 @@ def export_api():
     return jsonify({"status": "started"})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=9876, debug=True)
+    app.run(host="0.0.0.0", port=8080, debug=True)
